@@ -36,9 +36,9 @@ class Command(BaseCommand):
         with open(csv_file, 'r') as f:
             reader = csv.reader(f)
             for row in reader:
-                title, link, source = row
+                title, link, source, path = row
                 type = 'mp4' if link.endswith('.mp4') else 'mkv'
                 source = self.sources[source]
-                Movie.objects.get_or_create(title=title, type=type, link=link, source=source)
+                Movie.objects.get_or_create(title=title, type=type, link=link, source=source, path=path)
 
         self.stdout.write(self.style.SUCCESS('Movies loaded successfully'))

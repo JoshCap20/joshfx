@@ -33,11 +33,13 @@
             <div class="col-md-4 col-sm-6 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title"><a href="/stream/{{movie.id}}">{{ movie.title }}</a></h5>
-                        <p class="card-text">Source ID: {{ movie.source }}</p>
-                        <p class="card-text">{{ movie.type }}</p>
+                        <h5 class="card-title m-0"><a href="/stream/{{movie.id}}">{{ movie.title }}</a></h5>
+                        <p class="card-subtitle text-muted m-0">{{ movie.path }}</p>
+                        <p class="card-text m-0">Source ID: {{ movie.source }}</p>
+                        <p class="card-text m-0">{{ movie.type }}</p>
                         {% if movie.type == 'mkv' %}
-                        <p class="card-text text-danger">This movie is in MKV format. It may not play in your browser (Supported: Chrome).</p>
+                        <sub class="card-subtitle text-danger">This movie is in MKV format. It may not play in your browser (Supported:
+                            Chrome).</sub>
                         {% endif %}
                     </div>
                 </div>

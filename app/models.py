@@ -7,6 +7,7 @@ import requests
 # Create your models here.
 class Movie(models.Model):
     title = models.CharField(max_length=100)
+    path = models.CharField(max_length=200)
     type = models.CharField(max_length=30)
     link = models.CharField(max_length=200)
     source = models.CharField(max_length=100)

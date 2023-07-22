@@ -15,17 +15,17 @@ class Scraper:
         "http://102.212.178.1:8089/",
         "http://185.223.160.51/",
         "http://192.121.102.206/",
-        "http://92.247.236.71:9800/",
         "http://66.242.75.177/",
         "http://195.154.237.18:9000/",
         "http://210.54.35.157:9000/",
-        # "http://124.184.68.140/",
         "http://195.154.108.130:9000/",
         "http://120.28.137.252/",
         "http://144.137.208.140:9000/",
         "http://72.253.204.218:9999/movies/",
-        "http://96.233.113.244/",
-        "http://23.147.64.113/",
+        # "http://96.233.113.244/",
+        # "http://23.147.64.113/",
+        # "http://92.247.236.71:9800/",
+        # "http://124.184.68.140/",
     ]
 
     @classmethod
@@ -42,8 +42,8 @@ class Scraper:
             return re.compile(r'(.*/)([\w\.\-\']+)[._](\d{3,4})[._]?(\w*p)?[._]?.*')
         elif cls.sources[2] == source:
             return re.compile(r'(/)?(([\w\.\%]+)[._](\d{4}|S\d+E\d+)[._]?(.*))\.(mkv|mp4)$')
-        elif cls.sources[4] == source:
-            return re.compile(r'(.*?),(http://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}.*?),(http://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/),(/.*?\.(mkv|mp4))')
+        elif cls.sources[3] == source:
+            return re.compile(r"/tv/(.*?)/Season.*?/(.*?)%20-%20(S\d{2}E\d{2})")
         return re.compile(r'(.*/S\d+/)([\w\.]+).S(\d+)E(\d+)')
         
     @classmethod
@@ -62,12 +62,10 @@ class Scraper:
             title = match.group(2).replace('.', ' ').replace('%20', ' ') if match.group(2) else ''
             year_or_season_episode = match.group(4) if match.group(4) else ''
             return f"{title} {year_or_season_episode}"
-        elif cls.sources[4] == source:
-            show_name = match.group(1).replace('.', ' ') if match.group(1) else ''
-            link1 = match.group(2) if match.group(2) else ''
-            link2 = match.group(3) if len(match.groups()) >= 3 and match.group(3) else ''
-            file = match.group(4) if len(match.groups()) >= 4 and match.group(4) else ''
-            return f"{show_name}, {link1}, {link2}, {file}"
+        elif cls.sources[3] == source:
+            title = re.sub('%20', ' ', match.group(1))  # Replace URL encoded spaces with actual spaces
+            season_episode = match.group(3)
+            return f"{title} {season_episode}"
         show_name = match.group(2).replace('.', ' ') if match.group(2) else ''
         season = f"S{match.group(3)}" if len(match.groups()) >= 3 and match.group(3) else ''
         episode = f"E{match.group(4)}" if len(match.groups()) >= 4 and match.group(4) else ''
@@ -117,7 +115,7 @@ class Scraper:
                 title = os.path.basename(directory)
                 title = unquote(title)
 
-            with open('videos.csv', 'a', newline='') as f:
+            with open('5.csv', 'a', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow([title, video_url, base_url, path])
 

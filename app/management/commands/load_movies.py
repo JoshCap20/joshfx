@@ -37,6 +37,10 @@ class Command(BaseCommand):
             reader = csv.reader(f)
             for row in reader:
                 title, link, source, path = row
+                if '%27' in title:
+                    title = title.replace('%27', "'")
+                elif '%20' in title:
+                    title = title.replace('%20', ' ')
                 type = 'mp4' if link.endswith('.mp4') else 'mkv'
                 source = self.sources[source]
                 Movie.objects.get_or_create(title=title, type=type, link=link, source=source, path=path)

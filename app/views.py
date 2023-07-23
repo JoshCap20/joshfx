@@ -4,19 +4,11 @@ from app.models import Movie
 from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 
 def stream(request, query):
-  movie = Movie.objects.get(id=query)
-  # if movie.type == "mkv":
-  #   return stream_mkv(request, query)
-  # return movie.stream_external_video()
+  try:
+    movie = Movie.objects.get(id=query)
+  except Movie.DoesNotExist:
+    return HttpResponseNotFound("Movie not found")
   return movie.stream_external_video_adv(request)
-
-def stream_mkv(request, query):
-  # movie = Movie.objects.get(id=query)
-  if query.isdigit():
-    movie = get_object_or_404(Movie, id=query)
-  else:
-    movie = Movie.objects.filter(title__icontains=query).first()
-  return render(request, 'mkv.html', {'movie': movie})
     
 def index(request):
   query = request.GET.get('q', '')
@@ -64,7 +56,7 @@ def get_results(request):
     movie = Movie.objects.filter(title__icontains=query).only('id', 'title', 'link')
     
     if movie:
-        # movie.link is a URL to the video file
-        return JsonResponse([mov.json() for mov in movie], safe=False)
+      # movie.link is a URL to the video file
+      return JsonResponse([mov.json() for mov in movie], safe=False)
     else:
-        return HttpResponseNotFound("No movie found")
+      return HttpResponseNotFound("No movie found")

@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app.views import stream, index
+from app.views import stream, index, get_link
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", index, name="index"),
-    path("stream/<str:query>", stream, name="stream")
+    path("stream/<str:query>", stream, name="stream"),
+    path("api/<str:query>", get_link, name="get_link"),
 ]

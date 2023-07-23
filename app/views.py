@@ -14,8 +14,10 @@ def stream_mkv(request, query):
 
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 
-def get_link(request, query):
+def get_link(request):
     # If query is not a number, look up title
+    query = request.GET.get('q', '')
+    
     if query.isdigit():
         movie = get_object_or_404(Movie, id=query)
     else:

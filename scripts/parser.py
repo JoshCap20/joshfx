@@ -75,8 +75,6 @@ class Scraper:
 
     @classmethod
     def find_videos(cls, base_url, path='') -> None:
-        if cls.sources.index(base_url) <= 2:
-            return
         pattern = cls.__get_pattern(base_url)
         page_url = urljoin(base_url, path)
 
@@ -117,7 +115,7 @@ class Scraper:
                 title = os.path.basename(directory)
                 title = unquote(title)
 
-            with open('7.csv', 'a', newline='') as f:
+            with open('video.csv', 'a', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow([title, video_url, base_url, path])
 

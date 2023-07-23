@@ -45,7 +45,7 @@
             <div class="col-md-4 col-sm-6 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title m-0"><a href="/stream/{{movie.id}}">{{ movie.title }}</a></h5>
+                        <h5 class="card-title m-0"><a href="/stream/{{movie.id}}">{{ movie.title|truncatechars:40 }}</a></h5>
                         <p class="card-subtitle text-muted m-0" style="font-size:10px">{{ movie.path|truncatechars:40 }}
                         </p>
                         <p class="card-text m-0">Source ID: {{ movie.source }}</p>
@@ -56,7 +56,7 @@
                             browser (Supported:
                             Chrome).
                             </sub>
-                            <a class="btn btn-light btn-outline-secondary btn-small" href='{{movie.link}}' download>Download</a>
+                            <a class="btn btn-light btn-outline-secondary btn-sm" href='{{movie.link}}' download>Download</a>
                         {% endif %}
                     </div>
                 </div>
@@ -68,6 +68,12 @@
             {% endfor %}
         </div>
     </div>
+    <script>
+        var type = "{{ request.GET.type }}";
+        if (type) {
+            document.querySelector(`select[name="type"] option[value="${type}"]`).selected = true;
+        }
+    </script>
 </body>
 
 </html>

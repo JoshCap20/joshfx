@@ -53,7 +53,7 @@ python manage.py makemigrations || handle_error "Failed to run makemigrations."
 python manage.py migrate || handle_error "Failed to run migrations."
 log_success "Migrations completed."
 
-python manage.py load_movies video32.csv || handle_error "Failed to load movies."
+python manage.py load_movies video.csv || handle_error "Failed to load movies."
 open http://localhost:8000
 python manage.py runserver
 

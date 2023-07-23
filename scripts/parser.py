@@ -43,7 +43,7 @@ class Scraper:
         elif cls.sources[2] == source:
             return re.compile(r'(/)?(([\w\.\%]+)[._](\d{4}|S\d+E\d+)[._]?(.*))\.(mkv|mp4)$')
         elif cls.sources[3] == source:
-            return re.compile(r"/tv/(.*?)/Season.*?/(.*?)%20-%20(S\d{2}E\d{2})")
+            return re.compile(r"/tv/(.*?)/Season.*?/(.*?) - (S\d{2}E\d{2})")
         return re.compile(r'(.*/S\d+/)([\w\.]+).S(\d+)E(\d+)')
         
     @classmethod
@@ -63,9 +63,9 @@ class Scraper:
             year_or_season_episode = match.group(4) if match.group(4) else ''
             return f"{title} {year_or_season_episode}"
         elif cls.sources[3] == source:
-            title = re.sub('%20', ' ', match.group(1))  # Replace URL encoded spaces with actual spaces
+            title = re.sub('%20', ' ', match.group(1))
             season_episode = match.group(3)
-            return f"{title} {season_episode}"
+            return f"{title} - {season_episode}"
         show_name = match.group(2).replace('.', ' ') if match.group(2) else ''
         season = f"S{match.group(3)}" if len(match.groups()) >= 3 and match.group(3) else ''
         episode = f"E{match.group(4)}" if len(match.groups()) >= 4 and match.group(4) else ''
@@ -115,7 +115,7 @@ class Scraper:
                 title = os.path.basename(directory)
                 title = unquote(title)
 
-            with open('5.csv', 'a', newline='') as f:
+            with open('7.csv', 'a', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow([title, video_url, base_url, path])
 

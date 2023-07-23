@@ -16,15 +16,15 @@ class Scraper:
         "http://185.223.160.51/",
         "http://192.121.102.206/",
         "http://66.242.75.177/",
+        "http://96.233.113.244/",
         # "http://195.154.237.18:9000/",
         # "http://210.54.35.157:9000/",
         # "http://195.154.108.130:9000/",
         # "http://120.28.137.252/",
         # "http://144.137.208.140:9000/",
         # "http://72.253.204.218:9999/movies/",
-        # "http://96.233.113.244/",
         # "http://23.147.64.113/",
-        # "http://92.247.236.71:9800/",
+        # "http://92.247.236.71:9800/", # NEVER LOADS
         # "http://124.184.68.140/",
     ]
 
@@ -44,6 +44,9 @@ class Scraper:
             return re.compile(r'(/)?(([\w\.\%]+)[._](\d{4}|S\d+E\d+)[._]?(.*))\.(mkv|mp4)$')
         elif cls.sources[3] == source:
             return re.compile(r"/tv/(.*?)/Season.*?/(.*?) - (S\d{2}E\d{2})")
+        elif cls.sources[4] == source:
+            # return re.compile(r'/TV/([^/]+)/Season\s+(\d+)/([^/]+) S(\d+)E(\d+) ')
+            return re.compile(r'\/TV\/([^\/]+)\/Season( |%20)(\d+)\/[^\/]+ S(\d+)E(\d+)')
         return re.compile(r'(.*/S\d+/)([\w\.]+).S(\d+)E(\d+)')
         
     @classmethod
@@ -68,6 +71,12 @@ class Scraper:
                 title = re.sub('%27', '\'', title)
             season_episode = match.group(3)
             return f"{title} - {season_episode}"
+        elif cls.sources[4] == source:
+            show_title = match.group(1).replace('%20', ' ')
+            season = match.group(4)
+            episode = match.group(5)
+            return f"{show_title}, S{season}Episode: {episode}"
+
         show_name = match.group(2).replace('.', ' ') if match.group(2) else ''
         season = f"S{match.group(3)}" if len(match.groups()) >= 3 and match.group(3) else ''
         episode = f"E{match.group(4)}" if len(match.groups()) >= 4 and match.group(4) else ''
@@ -75,6 +84,8 @@ class Scraper:
 
     @classmethod
     def find_videos(cls, base_url, path='') -> None:
+        if cls.sources.index(base_url) != 4:
+            return
         pattern = cls.__get_pattern(base_url)
         page_url = urljoin(base_url, path)
 
@@ -106,7 +117,9 @@ class Scraper:
             title = os.path.basename(path)
             
             title = unquote(title)
+            
             full_path = os.path.join(directory, title)
+            print("FULL " + full_path)
             match = pattern.search(full_path)
 
             if match:
@@ -114,6 +127,8 @@ class Scraper:
             else:
                 title = os.path.basename(directory)
                 title = unquote(title)
+                
+            print(f"Found: {title} {video_url} {base_url} {path}")
 
             with open('video.csv', 'a', newline='') as f:
                 writer = csv.writer(f)
@@ -125,8 +140,12 @@ class Scraper:
 
             if not href.endswith('/'):
                 continue
+            
+            # if path.startswith("/"):
+            #     path = path[1:]
 
-            cls.find_videos(base_url, os.path.join(path, href))
+            # cls.find_videos(base_url, os.path.join(path, href))
+            cls.find_videos(base_url, urljoin(path, href))
 
     
 

@@ -73,9 +73,11 @@ class Scraper:
             return f"{title} - {season_episode}"
         elif cls.sources[4] == source:
             show_title = match.group(1).replace('%20', ' ')
+            if "%27" in show_title:
+                show_title = re.sub('%27', '\'', show_title)
             season = match.group(4)
             episode = match.group(5)
-            return f"{show_title}, S{season}Episode: {episode}"
+            return f"{show_title}, S{season}E{episode}"
 
         show_name = match.group(2).replace('.', ' ') if match.group(2) else ''
         season = f"S{match.group(3)}" if len(match.groups()) >= 3 and match.group(3) else ''
@@ -84,8 +86,6 @@ class Scraper:
 
     @classmethod
     def find_videos(cls, base_url, path='') -> None:
-        if cls.sources.index(base_url) != 4:
-            return
         pattern = cls.__get_pattern(base_url)
         page_url = urljoin(base_url, path)
 

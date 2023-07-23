@@ -1,31 +1,44 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Q
 from app.models import Movie
+from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 
 def stream(request, query):
   movie = Movie.objects.get(id=query)
   # if movie.type == "mkv":
   #   return stream_mkv(request, query)
-  return movie.stream_external_video()
+  # return movie.stream_external_video()
+  return movie.stream_external_video_adv(request)
 
 def stream_mkv(request, query):
   movie = Movie.objects.get(id=query)
   return render(request, 'mkv.html', {'movie': movie})
 
-from django.http import HttpResponseNotFound, HttpResponseRedirect
-
 def get_link(request):
     # If query is not a number, look up title
     query = request.GET.get('q', '')
-    
+
     if query.isdigit():
         movie = get_object_or_404(Movie, id=query)
     else:
-        movie = Movie.objects.filter(title__icontains=query, type="mp4").first()
+        movie = Movie.objects.filter(title__icontains=query).first()
     
     if movie:
         # movie.link is a URL to the video file
         return HttpResponseRedirect(movie.link, status=302)
+    else:
+        return HttpResponseNotFound("No movie found")
+
+def get_results(request):
+    # If query is not a number, look up title
+    query = request.GET.get('q', '')
+
+    movie = Movie.objects.filter(title__icontains=query).only('id', 'title', 'link')
+    
+    if movie:
+        # movie.link is a URL to the video file
+        print(list(movie.values()))
+        return JsonResponse(list(movie.values()), safe=False)
     else:
         return HttpResponseNotFound("No movie found")
     

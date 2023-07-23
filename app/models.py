@@ -3,6 +3,8 @@ import subprocess
 from django.db import models
 from django.http import StreamingHttpResponse
 import requests
+from wsgiref.util import FileWrapper
+import re
 
 # Create your models here.
 class Movie(models.Model):
@@ -49,7 +51,38 @@ class Movie(models.Model):
               yield chunk
 
       return StreamingHttpResponse(generate(), content_type='video/mp4')
+    
+    def stream_external_video_adv(self, request):
+        url = self.link
 
+        range_header = request.META.get('HTTP_RANGE', '').strip()
+        range_match = re.match(r'bytes=(\d+)-(\d+)?', range_header)
+
+        if range_match is None:
+            headers = {}
+            status_code = 200
+        else:
+            start, end = range_match.groups()
+            if end is None:
+                # No end, get the rest of the file
+                headers = {"Range": f"bytes={start}-"}
+            else:
+                headers = {"Range": f"bytes={start}-{end}"}
+            status_code = 206
+
+        resp = requests.get(url, headers=headers, stream=True)
+
+        response = StreamingHttpResponse(
+            FileWrapper(resp.raw),
+            status=status_code,
+            content_type='video/mp4'
+        )
+
+        if 'Content-Range' in resp.headers:
+            response['Content-Range'] = resp.headers['Content-Range']
+        response['Accept-Ranges'] = 'bytes'
+
+        return response
 
     def stream_video(self):
       print("Streaming video...")

@@ -8,8 +8,15 @@ def stream(request, query):
 
 def index(request):
   query = request.GET.get('q', '')
+  type = request.GET.get('type', 'all')
   if query:
-      movies = Movie.objects.filter(Q(title__icontains=query) | Q(path__icontains=query))
+      if type == "all":
+        movies = Movie.objects.filter(Q(title__icontains=query) | Q(path__icontains=query))
+      else:
+        movies = Movie.objects.filter(Q(title__icontains=query) | Q(path__icontains=query)).filter(type=type)
   else:
-      movies = Movie.objects.all()
+      if type == "all":
+        movies = Movie.objects.all()
+      else:
+        movies = Movie.objects.filter(type=type)
   return render(request, 'index.html', {'movies': movies})

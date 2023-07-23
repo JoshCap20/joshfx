@@ -15,17 +15,29 @@
 
 <body>
     <div class="container my-4">
-        <a href="/"><h1 class="text-center mb-4">JoshFX</h1></a>
+        <a href="/">
+            <h1 class="text-center mb-4">JoshFX</h1>
+        </a>
 
         <!-- Search form -->
         <form class="mb-4">
             <div class="input-group">
                 <input type="text" name="q" class="form-control" placeholder="Search for a movie..." value="{{ request.GET.q }}">
+                <select name="type" class="form-control">
+                    <option value="all">All</option>
+                    <option value="mp4">MP4</option>
+                    <option value="mkv">MKV</option>
+                </select>
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary" type="submit">Search</button>
                 </div>
             </div>
         </form>
+        <div class="row">
+            <div class="col">
+                <h5>Results ({{ movies|length }})</h5>
+            </div>
+        </div>
 
         <!-- Movies list -->
         <div class="row">
@@ -38,7 +50,8 @@
                         <p class="card-text m-0">Source ID: {{ movie.source }}</p>
                         <p class="card-text m-0">{{ movie.type }}</p>
                         {% if movie.type == 'mkv' %}
-                        <sub class="card-subtitle text-danger">This movie is in MKV format. It may not play in your browser (Supported:
+                        <sub class="card-subtitle text-danger">This movie is in MKV format. It may not play in your
+                            browser (Supported:
                             Chrome).</sub>
                         {% endif %}
                     </div>

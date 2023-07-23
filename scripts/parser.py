@@ -64,6 +64,8 @@ class Scraper:
             return f"{title} {year_or_season_episode}"
         elif cls.sources[3] == source:
             title = re.sub('%20', ' ', match.group(1))
+            if "%27" in title:
+                title = re.sub('%27', '\'', title)
             season_episode = match.group(3)
             return f"{title} - {season_episode}"
         show_name = match.group(2).replace('.', ' ') if match.group(2) else ''

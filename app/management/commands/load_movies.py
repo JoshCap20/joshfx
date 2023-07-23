@@ -27,6 +27,9 @@ class Command(BaseCommand):
         parser.add_argument('csv_file', type=str, help='The CSV file to load')
 
     def handle(self, *args, **kwargs):
+        if Movie.objects.count() > 0:
+            self.stdout.write(self.style.SUCCESS('Movies already loaded'))
+            return
         csv_file = kwargs['csv_file']
 
         if not os.path.exists(csv_file):

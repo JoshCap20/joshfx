@@ -46,13 +46,17 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title m-0"><a href="/stream/{{movie.id}}">{{ movie.title }}</a></h5>
-                        <p class="card-subtitle text-muted m-0">{{ movie.path }}</p>
+                        <p class="card-subtitle text-muted m-0" style="font-size:10px">{{ movie.path|truncatechars:40 }}
+                        </p>
                         <p class="card-text m-0">Source ID: {{ movie.source }}</p>
                         <p class="card-text m-0">{{ movie.type }}</p>
                         {% if movie.type == 'mkv' %}
-                        <sub class="card-subtitle text-danger">This movie is in MKV format. It may not play in your
+                        <sub class="card-subtitle text-danger" style="font-size:10px">This movie is in MKV format. It
+                            may not play in your
                             browser (Supported:
-                            Chrome).</sub>
+                            Chrome).
+                            </sub>
+                            <a class="btn btn-light btn-outline-secondary btn-small" href='{{movie.link}}' download>Download</a>
                         {% endif %}
                     </div>
                 </div>

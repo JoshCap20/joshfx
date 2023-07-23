@@ -67,6 +67,15 @@ log_success "Migrations completed."
 
 python manage.py load_movies video.csv || handle_error "Failed to load movies."
 
+if lsof -ti :8000 > /dev/null
+then
+    echo "Something is running on port 8000, attempting to kill..."
+    lsof -ti :8000 | xargs kill -9
+    echo "Processes killed."
+else
+    echo "Nothing is running on port 8000."
+fi
+
 log_message "Starting the server on port 8000 at 127.0.0.1..." 
 open http://127.0.0.1:8000
 python -m gunicorn -c joshfx/gunicorn.config.py joshfx.asgi:application || handle_error "Failed to start server."

@@ -9,7 +9,7 @@ def stream(request, query):
 def index(request):
   query = request.GET.get('q', '')
   if query:
-      movies = Movie.objects.filter(Q(title__icontains=query))
+      movies = Movie.objects.filter(Q(title__icontains=query) | Q(path__icontains=query))
   else:
       movies = Movie.objects.all()
   return render(request, 'index.html', {'movies': movies})

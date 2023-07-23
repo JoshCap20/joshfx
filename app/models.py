@@ -5,6 +5,7 @@ from django.http import StreamingHttpResponse
 import requests
 from wsgiref.util import FileWrapper
 import re
+from urllib3.exceptions import ProtocolError
 
 # Create your models here.
 class Movie(models.Model):
@@ -72,11 +73,15 @@ class Movie(models.Model):
 
         resp = requests.get(url, headers=headers, stream=True)
 
-        response = StreamingHttpResponse(
-            FileWrapper(resp.raw),
-            status=status_code,
-            content_type='video/mp4'
-        )
+        try:
+            response = StreamingHttpResponse(
+                FileWrapper(resp.raw),
+                status=status_code,
+                content_type='video/mp4'
+            )
+        except ProtocolError as e:
+            print(f"Stream was interrupted: {e}")
+
 
         if 'Content-Range' in resp.headers:
             response['Content-Range'] = resp.headers['Content-Range']
@@ -96,3 +101,14 @@ class Movie(models.Model):
       os.remove(mp4_path)
 
       return StreamingHttpResponse(generate(), content_type='video/mp4')
+    
+    def json(self):
+      return {
+        "id": self.id,
+        "title": self.title,
+        "path": self.path,
+        "type": self.type,
+        "link": self.link,
+        "source": self.source,
+        "stream": f"http://10.0.2.2:8000/stream/{self.id}",
+      }

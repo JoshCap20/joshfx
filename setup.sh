@@ -48,13 +48,28 @@ log_message "Checking for any missing requirements..."
 pip install -r requirements.txt || handle_error "Failed to install requirements."
 log_success "All requirements are met."
 
+# Check if gunicorn is installed
+if ! pip freeze | grep gunicorn > /dev/null; then
+  log_message "Gunicorn not found in the virtual environment. Installing..."
+  pip install gunicorn || handle_error "Failed to install gunicorn."
+fi
+
+# Check if uvicorn is installed
+if ! pip freeze | grep uvicorn > /dev/null; then
+  log_message "Uvicorn not found in the virtual environment. Installing..."
+  pip install uvicorn || handle_error "Failed to install uvicorn."
+fi
+
 log_message "Running migrations..."
 python manage.py makemigrations || handle_error "Failed to run makemigrations."
 python manage.py migrate || handle_error "Failed to run migrations."
 log_success "Migrations completed."
 
 python manage.py load_movies video.csv || handle_error "Failed to load movies."
-open http://localhost:8000
-python manage.py runserver && log_success "Setup complete. Goto localhost:8000 in a browser."
+
+log_message "Starting the server on port 8000 at 127.0.0.1..." 
+open http://127.0.0.1:8000
+python -m gunicorn -c joshfx/gunicorn.config.py joshfx.asgi:application || handle_error "Failed to start server."
+
 
 exit 0

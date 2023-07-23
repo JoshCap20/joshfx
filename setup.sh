@@ -29,7 +29,9 @@ log_message() {
 # Setup process
 command -v python3 >/dev/null 2>&1 || handle_error "Python 3 is not installed. Please install Python 3 before running the application."
 
-log_message "Setup started."
+# log_message "You have been hacked!"
+# sleep 5
+# log_message "Just kidding. Setup started."
 
 if [ ! -d "venv" ]; then
     echo "Virtual environment not found. Creating a new one..."
@@ -51,7 +53,8 @@ python manage.py makemigrations || handle_error "Failed to run makemigrations."
 python manage.py migrate || handle_error "Failed to run migrations."
 log_success "Migrations completed."
 
-python manage.py load_movies video32.csv
+python manage.py load_movies video32.csv || handle_error "Failed to load movies."
+open http://localhost:8000
 python manage.py runserver
 
 exit 0

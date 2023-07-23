@@ -78,7 +78,7 @@ fi
 
 log_message "Starting the server on port 8000 at 127.0.0.1..." 
 open http://127.0.0.1:8000
-python -m gunicorn -c joshfx/gunicorn.config.py joshfx.asgi:application || handle_error "Failed to start server."
+python manage.py runserver || handle_error "Failed to start server."
 
 
 exit 0

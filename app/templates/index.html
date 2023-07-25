@@ -10,6 +10,21 @@
         .card {
             height: 100%;
         }
+
+        .card:hover {
+            transform: scale(1.03);
+            transition: transform .2s;
+        }
+
+        .card-img-top {
+            height: 15vw;
+            object-fit: cover;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+        }
     </style>
 </head>
 
@@ -43,7 +58,8 @@
         <!-- Search form -->
         <form id="search-form" class="mb-4">
             <div class="input-group">
-                <input type="text" name="q" class="form-control" placeholder="Search for a movie..." value="{{ request.GET.q }}">
+                <input type="text" name="q" class="form-control" placeholder="Search for a movie..."
+                    value="{{ request.GET.q }}">
                 <select name="media" class="form-control">
                     <option value="all">All Media</option>
                     <option value="movie">Movies</option>
@@ -61,11 +77,6 @@
         </form>
         <div class="row">
             <div class="col">
-                {% if not request.GET.q %}
-                <div class="alert alert-info" role="alert">
-                    <p class="m-0">Since no query, only showing family guy.</p>
-                </div>
-                {% endif %}
                 <h5>Results</h5>
             </div>
         </div>
@@ -73,58 +84,121 @@
         <!-- Movies list -->
         <div id="movies-list" class="row">
         </div>
-        </div>
-        <script>
-            if (!window.chrome) {
-                document.querySelector('.alert').style.display = 'block';
+        <nav class="mt-4">
+            <div class="row">
+                <div class="col text-center">
+                    <button id="prev-btn" class="btn btn-outline-secondary">Previous</button>
+                    <button id="next-btn" class="btn btn-outline-secondary">Next</button>
+                </div>
+            </div>
+        </nav>
+
+    </div>
+    <script>
+
+        if (!window.chrome) {
+            document.querySelector('.alert').style.display = 'block';
+        }
+
+        document.querySelector('.alert button').addEventListener('click', function () {
+            document.querySelector('.alert').style.display = 'none';
+        });
+
+        function setFormValues() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const q = urlParams.get('q');
+            const media = urlParams.get('media');
+            const type = urlParams.get('type');
+            if (q) {
+                document.getElementById('search-form').elements.namedItem("q").value = q;
             }
-            // close alert
-            document.querySelector('.alert button').addEventListener('click', function () {
-                document.querySelector('.alert').style.display = 'none';
-            });
-            // var type = "{{ request.GET.type }}";
-            // if (type) {
-            //     document.querySelector(`select[name="type"] option[value="${type}"]`).selected = true;
-            // }
-            document.addEventListener('DOMContentLoaded', (event) => {
-                const form = document.getElementById('search-form');
-                const query = form.elements.namedItem("q").value;
-                const media = form.elements.namedItem("media").value;
-                const type = form.elements.namedItem("type").value;
-                const moviesList = document.getElementById("movies-list");
-                const spinner = document.createElement('div');
-                spinner.className = 'd-flex justify-content-center w-100';
-                spinner.innerHTML = `
+            if (media) {
+                document.getElementById('search-form').elements.namedItem("media").value = media;
+            }
+            if (type) {
+                document.getElementById('search-form').elements.namedItem("type").value = type;
+            }
+        }
+
+        let currentPage = 1;
+        document.addEventListener('DOMContentLoaded', (event) => {
+            setFormValues();
+            fetchMovies();
+        });
+
+        const fetchMovies = () => {
+            const form = document.getElementById('search-form');
+            const query = form.elements.namedItem("q").value;
+            const media = form.elements.namedItem("media").value;
+            const type = form.elements.namedItem("type").value;
+            const moviesList = document.getElementById("movies-list");
+            const spinner = document.createElement('div');
+            spinner.className = 'd-flex justify-content-center w-100';
+            spinner.innerHTML = `
             <div class="spinner-grow text-primary" role="status">
                 <span class="sr-only">Loading...</span>
             </div>`;
-                moviesList.appendChild(spinner);
-                fetch(`/search?q=${query}&media=${media}&type=${type}`)
-                    .then(response => response.json())
-                    .then(movies => {
-                        moviesList.innerHTML = '';
-                        movies.forEach(movie => {
-                            let movieCard = `
-                            <div class="col-md-4 col-sm-6 mb-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                <h5 class="card-title m-0"><a href="/stream/${movie.id}">${movie.title}</a></h5>
-                                <p class="card-subtitle text-muted m-0" style="font-size:10px">${movie.path.substr(0, 40)}</p>
-                                <p class="card-text m-0">Source ID: ${movie.source}</p>
-                                <p class="card-text m-0">${movie.type}</p>`;
-                        if (movie.type === 'mkv') {
-                            movieCard += `
-                        <sub class="card-subtitle text-danger" style="font-size:10px">This movie is in MKV format. It may not play in your browser (Supported: Chrome).</sub>
-                        <a class="btn btn-light btn-outline-secondary btn-sm" href='${movie.link}' download>Download</a>`;
-                        }
-                        movieCard += `</div></div></div >`;
+            moviesList.appendChild(spinner);
+            fetch(`/search?q=${query}&media=${media}&type=${type}&page=${currentPage}`)
+                .then(response => response.json())
+                .then(movies => {
+                    moviesList.innerHTML = '';
+                    movies.forEach(movie => {
+                        const movieCard = document.createElement('div');
+                        movieCard.className = 'col-md-3 col-sm-4 mb-4';
 
-                        moviesList.innerHTML += movieCard;
+                        const card = document.createElement('div');
+                        card.className = 'card h-100 shadow-sm';
+                        const cardImage = document.createElement('img');
+                        cardImage.className = 'card-img-top';
+                        cardImage.src = movie.image ? movie.image : '/static/placeholder.png';
+                        card.appendChild(cardImage);
+
+                        const cardBody = document.createElement('div');
+                        cardBody.className = 'card-body d-flex flex-column';
+
+                        let html = `
+                <h5 class="card-title m-0 text-truncate"><a href="/stream/${movie.id}">${movie.title}</a></h5>
+                <p class="card-subtitle text-muted m-0 text-truncate" style="font-size:10px">${movie.path}</p>
+                <p class="card-text m-0 mt-auto">Source ID: ${movie.source}</p>
+                <p class="card-text m-0">${movie.type}</p>
+                <div class="row">
+                    <div class="col">
+                        <a class="btn btn-light btn-outline-secondary btn btn-block" href='${movie.link}' download>Download</a>
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-secondary btn-outline-light btn btn-block" href="/stream/${movie.id}">Stream</a>
+                    </div>
+                </div>
+                `;
+                        cardBody.innerHTML = html;
+
+                        card.appendChild(cardBody);
+                        movieCard.appendChild(card);
+                        moviesList.appendChild(movieCard);
                     });
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
+        };
+
+        if (currentPage == 1) {
+            document.getElementById('prev-btn').disabled = true;
+        } else {
+            document.getElementById('prev-btn').disabled = false;
+        }
+
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchMovies();
+            }
+        });
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            currentPage++;
+            fetchMovies();
         });
     </script>
 </body>

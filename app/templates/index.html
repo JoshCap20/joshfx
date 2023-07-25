@@ -12,13 +12,15 @@
         }
 
         .card:hover {
-            transform: scale(1.03);
-            transition: transform .2s;
+            transform: scale(1.14);
+            transition: transform .4s;
+            z-index: 1;
         }
 
         .card-img-top {
             height: 15vw;
             object-fit: cover;
+            cursor: pointer;
         }
 
         .card-body {
@@ -160,6 +162,9 @@
                         const cardImage = document.createElement('img');
                         cardImage.className = 'card-img-top';
                         cardImage.src = movie.image ? movie.image : '/static/placeholder.png';
+                        cardImage.addEventListener('click', () => {
+                            window.location.href = `/stream/${movie.id}`;
+                        });
                         card.appendChild(cardImage);
 
                         const cardBody = document.createElement('div');

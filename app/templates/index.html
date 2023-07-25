@@ -31,9 +31,23 @@
                 document.querySelector('.alert').style.display = 'none';
             });
         </script>
-        <a href="/">
-            <h1 class="text-center mb-4">JoshFX</h1>
-        </a>
+        <div class="row align-items-center">
+            <div class="col text-center"></div>
+            <div class="col text-center">
+                <a href="/">
+                    <h1 class="mb-4">JoshFX</h1>
+                    </a>
+            </div>
+            <div class="col text-center">
+                <a href="https://github.com/JoshCap20/joshfx">
+                    <div class="mt-2">Source Code</div>
+                </a>
+                <a href="https://github.com/JoshCap20/JoshFX_Android_TV">
+                    <div class="mt-2">Android/Google/Fire TV App</div>
+                </a>
+            </div>
+            </div>
+
 
         <!-- Search form -->
         <form class="mb-4">
@@ -56,6 +70,11 @@
         </form>
         <div class="row">
             <div class="col">
+                {% if not request.GET.q %}
+                <div class="alert alert-info" role="alert">
+                    <p class="m-0">Since no query, only showing family guy.</p>
+                </div>
+                {% endif %}
                 <h5>Results ({{ movies|length }})</h5>
             </div>
         </div>

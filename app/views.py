@@ -1,13 +1,14 @@
-from asgiref.sync import sync_to_async
 from django.db.models import Q
 from django.http import (HttpResponseNotFound, HttpResponseRedirect,
                          JsonResponse)
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, render
 
 from app.models import Movie
 
 
 def stream(request, query):
+    if not query.isdigit() or query is None:
+        return HttpResponseNotFound("Movie not found")
     try:
         movie = Movie.objects.get(id=query)
     except Movie.DoesNotExist:
@@ -46,7 +47,10 @@ def index(request):
 
 def get_link(request):
     # If query is not a number, look up title
-    query = request.GET.get('q', '')
+    query = request.GET.get('q', None)
+
+    if query is None:
+        return HttpResponseNotFound("No query provided")
 
     if query.isdigit():
         movie = get_object_or_404(Movie, id=query)
@@ -54,7 +58,6 @@ def get_link(request):
         movie = Movie.objects.filter(title__icontains=query).first()
 
     if movie:
-        # movie.link is a URL to the video file
         return HttpResponseRedirect(movie.link, status=302)
     else:
         return HttpResponseNotFound("No movie found")
@@ -62,13 +65,15 @@ def get_link(request):
 
 def get_results(request):
     # If query is not a number, look up title
-    query = request.GET.get('q', '')
+    query = request.GET.get('q', None)
+
+    if query is None:
+        return HttpResponseNotFound("No query provided")
 
     movie = Movie.objects.filter(
         title__icontains=query).only('id', 'title', 'link')
 
     if movie:
-        # movie.link is a URL to the video file
         return JsonResponse([mov.json() for mov in movie], safe=False)
     else:
         return HttpResponseNotFound("No movie found")

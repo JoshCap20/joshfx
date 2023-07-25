@@ -30,3 +30,25 @@ class Movie(models.Model):
             "source": self.source,
             "stream": f"http://127.0.0.1:8000/stream/{self.id}",
         }
+
+
+class RequestManager(models.Manager):
+    def get_or_create(self, info):
+        try:
+            request = self.get(info=info)
+            request.count += 1
+            request.save()
+            return request
+        except Request.DoesNotExist:
+            return self.create(info=info)
+
+
+class Request(models.Model):
+    info = models.CharField(max_length=200)
+    date = models.DateTimeField(auto_now_add=True)
+    count = models.IntegerField(default=1)
+
+    objects = models.Manager()
+
+    def __str__(self):
+        return self.info + " - " + str(self.date) + " - " + str(self.count)

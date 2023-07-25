@@ -141,9 +141,9 @@
             moviesList.appendChild(spinner);
             fetch(`/search?q=${query}&media=${media}&type=${type}&page=${currentPage}`)
                 .then(response => response.json())
-                .then(movies => {
+                .then(info => {
                     moviesList.innerHTML = '';
-                    movies.forEach(movie => {
+                    info.movies.forEach(movie => {
                         const movieCard = document.createElement('div');
                         movieCard.className = 'col-md-3 col-sm-4 mb-4';
 
@@ -177,17 +177,24 @@
                         movieCard.appendChild(card);
                         moviesList.appendChild(movieCard);
                     });
+                    if (info.movies.length == 0) {
+                        moviesList.innerHTML = '<div class="col text-center">No results found.</div>';
+                    }
+                    if (info.pages == currentPage) {
+                        document.getElementById('next-btn').disabled = true;
+                    } else {
+                        document.getElementById('next-btn').disabled = false;
+                    }
+                    if (currentPage == 1) {
+                        document.getElementById('prev-btn').disabled = true;
+                    } else {
+                        document.getElementById('prev-btn').disabled = false;
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
         };
-
-        if (currentPage == 1) {
-            document.getElementById('prev-btn').disabled = true;
-        } else {
-            document.getElementById('prev-btn').disabled = false;
-        }
 
         document.getElementById('prev-btn').addEventListener('click', () => {
             if (currentPage > 1) {

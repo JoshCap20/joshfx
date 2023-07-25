@@ -45,7 +45,7 @@ class SearchAPI(View):
 
         movies = list(page_obj.object_list.values('id', 'title', 'link', 'source', 'type', 'path'))
 
-        return JsonResponse(movies, safe=False)
+        return JsonResponse({"movies":movies, "page":page_number, "pages":paginator.num_pages})
 
 
 def stream(request, query):

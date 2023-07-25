@@ -1,10 +1,13 @@
-import requests
-from bs4 import BeautifulSoup
 import csv
 import os
 import re
-from urllib.parse import urljoin, urlparse, unquote
+from urllib.parse import unquote, urljoin, urlparse
+
+import requests
+from bs4 import BeautifulSoup
+
 # from scripts.proxy import proxy_request
+
 
 class Scraper:
     visited = set()
@@ -20,12 +23,12 @@ class Scraper:
         "http://23.147.64.113/",
         "http://124.184.68.140/",
         # HAVENT TESTED BELOW
-        
+
         "https://didi2.ir/bestsitcomdl/",
         # "http://210.54.35.157:9000/",
         # "http://144.137.208.140:9000/",
         # "http://72.253.204.218:9999/movies/",
-        # "http://92.247.236.71:9800/" # Doesn't load 
+        # "http://92.247.236.71:9800/" # Doesn't load
         # "http://195.154.108.130:9000/", # Not Interesting
         # "http://120.28.137.252/", # Not Interesting
     ]
@@ -50,21 +53,28 @@ class Scraper:
             # return re.compile(r'/TV/([^/]+)/Season\s+(\d+)/([^/]+) S(\d+)E(\d+) ')
             return re.compile(r'\/TV\/([^\/]+)\/Season( |%20)(\d+)\/[^\/]+ S(\d+)E(\d+)')
         return re.compile(r'(.*/S\d+/)([\w\.]+).S(\d+)E(\d+)')
-        
+
     @classmethod
     def __extract_pattern(cls, source, match):
         if cls.sources[0] == source:
-            show_name = match.group(2).replace('.', ' ') if match.group(2) else ''
-            season = f"S{match.group(3)}" if len(match.groups()) >= 3 and match.group(3) else ''
-            episode = f"E{match.group(4)}" if len(match.groups()) >= 4 and match.group(4) else ''
+            show_name = match.group(2).replace(
+                '.', ' ') if match.group(2) else ''
+            season = f"S{match.group(3)}" if len(
+                match.groups()) >= 3 and match.group(3) else ''
+            episode = f"E{match.group(4)}" if len(
+                match.groups()) >= 4 and match.group(4) else ''
             return f"{show_name} {season}{episode}"
         elif cls.sources[1] == source:
-            show_name = match.group(2).replace('.', ' ') if match.group(2) else ''
-            year = f"({match.group(3)})" if len(match.groups()) >= 3 and match.group(3) and match.group(3) not in ["1400", "800", "MB", "mb"] else ''
-            quality = f"({match.group(4)})" if len(match.groups()) >= 4 and match.group(4) and match.group(4) not in ["mp4", "mkv"] else ''
+            show_name = match.group(2).replace(
+                '.', ' ') if match.group(2) else ''
+            year = f"({match.group(3)})" if len(match.groups()) >= 3 and match.group(
+                3) and match.group(3) not in ["1400", "800", "MB", "mb"] else ''
+            quality = f"({match.group(4)})" if len(match.groups()) >= 4 and match.group(
+                4) and match.group(4) not in ["mp4", "mkv"] else ''
             return f"{show_name} {year} {quality}"
         elif cls.sources[2] == source:
-            title = match.group(2).replace('.', ' ').replace('%20', ' ') if match.group(2) else ''
+            title = match.group(2).replace('.', ' ').replace(
+                '%20', ' ') if match.group(2) else ''
             year_or_season_episode = match.group(4) if match.group(4) else ''
             return f"{title} {year_or_season_episode}"
         elif cls.sources[3] == source:
@@ -82,8 +92,10 @@ class Scraper:
             return f"{show_title}, S{season}E{episode}"
 
         show_name = match.group(2).replace('.', ' ') if match.group(2) else ''
-        season = f"S{match.group(3)}" if len(match.groups()) >= 3 and match.group(3) else ''
-        episode = f"E{match.group(4)}" if len(match.groups()) >= 4 and match.group(4) else ''
+        season = f"S{match.group(3)}" if len(
+            match.groups()) >= 3 and match.group(3) else ''
+        episode = f"E{match.group(4)}" if len(
+            match.groups()) >= 4 and match.group(4) else ''
         return f"{show_name} {season}{episode}"
 
     @classmethod
@@ -103,7 +115,7 @@ class Scraper:
             # Need better error handling in future
             print(f"Error: {page_url}")
             return
-        
+
         # response = proxy_request(page_url)
         soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -117,9 +129,9 @@ class Scraper:
             path = urlparse(video_url).path
             directory = os.path.dirname(path)
             title = os.path.basename(path)
-            
+
             title = unquote(title)
-            
+
             full_path = os.path.join(directory, title)
             print("FULL " + full_path)
             match = pattern.search(full_path)
@@ -133,7 +145,7 @@ class Scraper:
                 else:
                     title = os.path.basename(directory)
                     title = unquote(title)
-                
+
             print(f"Found: {title} {video_url} {base_url} {path}")
 
             with open(cls.output_file, 'a', newline='') as f:
@@ -146,12 +158,13 @@ class Scraper:
 
             if not href.endswith('/'):
                 continue
-            
+
             # if path.startswith("/"):
             #     path = path[1:]
 
             # cls.find_videos(base_url, os.path.join(path, href))
             cls.find_videos(base_url, urljoin(path, href))
+
 
 if __name__ == "__main__":
     Scraper.scrape()

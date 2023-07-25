@@ -38,14 +38,14 @@ class SearchAPI(View):
         if media != "all":
             movies = movies.filter(path__icontains=media)
 
-        paginator = Paginator(movies, self.MOVIES_PER_PAGE) 
+        paginator = Paginator(movies, self.MOVIES_PER_PAGE)
 
         page_number = request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
 
         movies = list(page_obj.object_list.values('id', 'title', 'link', 'source', 'type', 'path'))
 
-        return JsonResponse({"movies":movies, "page":page_number, "pages":paginator.num_pages})
+        return JsonResponse({"movies":movies, "page":page_number, "pages":paginator.num_pages, "total":paginator.count})
 
 
 def stream(request, query):

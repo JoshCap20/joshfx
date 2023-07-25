@@ -58,8 +58,7 @@
         <!-- Search form -->
         <form id="search-form" class="mb-4">
             <div class="input-group">
-                <input type="text" name="q" class="form-control" placeholder="Search for a movie..."
-                    value="{{ request.GET.q }}">
+                <input type="text" name="q" class="form-control" placeholder="Search for a movie...">
                 <select name="media" class="form-control">
                     <option value="all">All Media</option>
                     <option value="movie">Movies</option>
@@ -77,7 +76,7 @@
         </form>
         <div class="row">
             <div class="col">
-                <h5>Results</h5>
+                <h5>Results <span id="count"></span></h5>
             </div>
         </div>
 
@@ -177,15 +176,17 @@
                         movieCard.appendChild(card);
                         moviesList.appendChild(movieCard);
                     });
+
+                    document.getElementById('count').innerHTML = `(${info.total})`;
                     if (info.movies.length == 0) {
                         moviesList.innerHTML = '<div class="col text-center">No results found.</div>';
                     }
-                    if (info.pages == currentPage) {
+                    if (info.pages <= currentPage) {
                         document.getElementById('next-btn').disabled = true;
                     } else {
                         document.getElementById('next-btn').disabled = false;
                     }
-                    if (currentPage == 1) {
+                    if (currentPage <= 1) {
                         document.getElementById('prev-btn').disabled = true;
                     } else {
                         document.getElementById('prev-btn').disabled = false;

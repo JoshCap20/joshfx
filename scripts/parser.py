@@ -4,12 +4,11 @@ import csv
 import os
 import re
 from urllib.parse import urljoin, urlparse, unquote
-from scripts.proxy import proxy_request
+# from scripts.proxy import proxy_request
 
 class Scraper:
     visited = set()
-    # pattern = re.compile(r'(.*/S\d+/)([\w\.]+).S(\d+)E(\d+)')
-    # pattern = re.compile(r'(.*/)([\w\.\-\']+)[._](\d{4}).*')
+    output_file = 'output.csv'
 
     sources: list[str] = [
         "http://102.212.178.1:8089/",
@@ -17,15 +16,18 @@ class Scraper:
         "http://192.121.102.206/",
         "http://66.242.75.177/",
         "http://96.233.113.244/",
-        # "http://195.154.237.18:9000/",
+        "http://195.154.237.18:9000/",
+        "http://23.147.64.113/",
+        "http://124.184.68.140/",
+        # HAVENT TESTED BELOW
+        
+        "https://didi2.ir/bestsitcomdl/",
         # "http://210.54.35.157:9000/",
-        # "http://195.154.108.130:9000/",
-        # "http://120.28.137.252/",
         # "http://144.137.208.140:9000/",
         # "http://72.253.204.218:9999/movies/",
-        # "http://23.147.64.113/",
-        # "http://92.247.236.71:9800/", # NEVER LOADS
-        # "http://124.184.68.140/",
+        # "http://92.247.236.71:9800/" # Doesn't load 
+        # "http://195.154.108.130:9000/", # Not Interesting
+        # "http://120.28.137.252/", # Not Interesting
     ]
 
     @classmethod
@@ -125,12 +127,16 @@ class Scraper:
             if match:
                 title = cls.__extract_pattern(base_url, match)
             else:
-                title = os.path.basename(directory)
-                title = unquote(title)
+                if base_url in cls.sources[6:8]:
+                    title = os.path.basename(path)
+                    title = unquote(title)
+                else:
+                    title = os.path.basename(directory)
+                    title = unquote(title)
                 
             print(f"Found: {title} {video_url} {base_url} {path}")
 
-            with open('video.csv', 'a', newline='') as f:
+            with open(cls.output_file, 'a', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow([title, video_url, base_url, path])
 
@@ -147,7 +153,8 @@ class Scraper:
             # cls.find_videos(base_url, os.path.join(path, href))
             cls.find_videos(base_url, urljoin(path, href))
 
-    
+if __name__ == "__main__":
+    Scraper.scrape()
 
 # base_url = 'http://102.212.178.1:8089/'
 # find_videos(base_url)

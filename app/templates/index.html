@@ -163,7 +163,7 @@
                         cardImage.className = 'card-img-top';
                         cardImage.src = movie.image ? movie.image : '/static/placeholder.png';
                         cardImage.addEventListener('click', () => {
-                            window.location.href = `/stream/${movie.id}`;
+                            window.location.href = `/streams/${movie.id}`;
                         });
                         card.appendChild(cardImage);
 
@@ -171,7 +171,7 @@
                         cardBody.className = 'card-body d-flex flex-column';
 
                         let html = `
-                <h5 class="card-title m-0 text-truncate" title="${movie.title}"><a href="/stream/${movie.id}">${movie.title}</a></h5>
+                <h5 class="card-title m-0 text-truncate" title="${movie.title}"><a href="/streams/${movie.id}">${movie.title}</a></h5>
                 <p class="card-subtitle text-muted m-0 text-truncate" style="font-size:10px">${movie.path}</p>
                 <div class="row my-1">
                     <div class="col-8">
@@ -186,7 +186,7 @@
                         <a class="btn btn-light btn-outline-secondary btn btn-block" href='${movie.link}' download>Download</a>
                     </div>
                     <div class="col">
-                        <a class="btn btn-secondary btn-outline-light btn btn-block" href="/stream/${movie.id}">Stream</a>
+                        <a class="btn btn-secondary btn-outline-light btn btn-block" href="/streams/${movie.id}">Stream</a>
                     </div>
                 </div>
                 `;

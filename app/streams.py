@@ -3,7 +3,12 @@ from wsgiref.util import FileWrapper
 
 import requests
 from django.http import StreamingHttpResponse
+from requests.adapters import HTTPAdapter
+from requests.exceptions import RequestException
+from urllib3.util.retry import Retry
 from urllib3.exceptions import ProtocolError
+
+from scripts.proxies import get_random_proxy_dict, get_random_user_agent
 
 
 def stream_external_video(movie):
@@ -34,7 +39,20 @@ def stream_external_video_adv(movie, request):
             headers = {"Range": f"bytes={start}-{end}"}
         status_code = 206
 
-    resp = requests.get(url, headers=headers, stream=True, timeout=(10, 30))
+    headers["User-Agent"] = get_random_user_agent()
+
+    session = requests.Session()
+    retry = Retry(total=3, backoff_factor=0.1, status_forcelist=[ 500, 502, 503, 504 ])
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+
+    try:
+        resp = session.get(url, headers=headers, stream=True, timeout=(10, 30), proxies=get_random_proxy_dict())
+    except RequestException as e:
+        print(f"Request failed: {e}")
+        return
+
 
     try:
         response = StreamingHttpResponse(

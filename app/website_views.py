@@ -42,9 +42,9 @@ class SearchAPI(View):
 
         if query != "all":
             movies = Movie.objects.filter(
-                Q(title__icontains=query) | Q(path__icontains=query))
+                Q(title__icontains=query) | Q(path__icontains=query), active=True)
         else:
-            movies = Movie.objects.all()
+            movies = Movie.objects.filter(active=True)
 
         if type != "all":
             movies = movies.filter(type=type)
@@ -52,6 +52,7 @@ class SearchAPI(View):
             movies = movies.filter(source=source)
         if media != "all":
             movies = movies.filter(path__icontains=media)
+        
 
         paginator = Paginator(movies, self.MOVIES_PER_PAGE)
 
@@ -65,6 +66,7 @@ class SearchAPI(View):
 
 
 def stream(request, query):
+    # STREAMS FROM SERVER
     if not query.isdigit() or not query:
         return HttpResponseNotFound("Movie not found")
     try:
@@ -72,3 +74,13 @@ def stream(request, query):
     except Movie.DoesNotExist:
         return HttpResponseNotFound("Movie not found")
     return movie.stream_external_video_adv(request)
+
+def js_stream(request, query):
+    # STREAMS VIA CLIENT JS
+    if not query.isdigit() or not query:
+        return HttpResponseNotFound("Movie not found")
+    try:
+        movie = Movie.objects.get(id=query)
+    except Movie.DoesNotExist:
+        return HttpResponseNotFound("Movie not found")
+    return render(request, "stream.html", {"movie": movie})

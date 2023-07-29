@@ -9,6 +9,7 @@ class Movie(models.Model):
     type = models.CharField(max_length=30)
     link = models.CharField(max_length=200)
     source = models.CharField(max_length=100)
+    active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.title

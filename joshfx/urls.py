@@ -12,8 +12,8 @@ urlpatterns = [
     path("search/", SearchAPI.as_view(), name="search"),
 
     ## Streams
-    path("stream/<str:query>", stream, name="stream"), # Server Stream (returns HTTPStreamingResponse)
-    path("streams/<str:query>", js_stream, name="js_stream"), # Client Stream (returns HTTP page)
+    path("streams/<str:query>", stream, name="stream"), # Server Stream (returns HTTPStreamingResponse)
+    path("stream/<str:query>", js_stream, name="js_stream"), # Client Stream (returns HTTP page)
 
     ## TV APIs
     path("api/", get_link, name="get_link"),

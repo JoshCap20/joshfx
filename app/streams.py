@@ -34,7 +34,7 @@ def stream_external_video_adv(movie, request):
             headers = {"Range": f"bytes={start}-{end}"}
         status_code = 206
 
-    resp = requests.get(url, headers=headers, stream=True)
+    resp = requests.get(url, headers=headers, stream=True, timeout=(10, 30))
 
     try:
         response = StreamingHttpResponse(

@@ -1,30 +1,15 @@
-import requests
 import random
-import json
 
-with open('proxies.json') as f:
-    data = json.load(f)
+from proxies import proxies, user_agents
 
-def proxy_request(url, request_type = "get", **kwargs):
-    while True:
-        try:
-            item = random.choice(data)
-            ip = item['ip']
-            port = item['port']
-            protocol = item['protocols'][0]  # select the first protocol
 
-            proxy = f"{protocol}://{ip}:{port}"
-            proxies = {"http": proxy, "https": proxy}
+def get_random_proxy() -> dict[str, str]:
+    return {
+        "socks4": random.choice(proxies)
+    }
 
-            if request_type.lower() == "get":
-                response = requests.get(url, proxies=proxies, **kwargs)
-            elif request_type.lower() == "post":
-                response = requests.post(url, proxies=proxies, **kwargs)
-            else:
-                raise ValueError("Invalid request_type. Choose either 'get' or 'post'")
-                
-            print(f"Proxy currently being used: {proxy}")
-            break
-        except:
-            print("Error, looking for another proxy")
-    return response
+
+def get_random_user_agent() -> dict[str, str]:
+    return {
+        "User-Agent": random.choice(user_agents)
+    }

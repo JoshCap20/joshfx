@@ -35,6 +35,8 @@ class Command(BaseCommand):
         if not os.path.exists(csv_file):
             self.stdout.write(self.style.ERROR(f'File "{csv_file}" does not exist'))
             return
+        
+        movies: list[Movie] = []
 
         with open(csv_file, 'r') as f:
             reader = csv.reader(f)
@@ -46,6 +48,7 @@ class Command(BaseCommand):
                     title = title.replace('%20', ' ')
                 type = 'mp4' if link.endswith('.mp4') else 'mkv'
                 source = self.sources[source]
-                Movie.objects.get_or_create(title=title, type=type, link=link, source=source, path=path)
+                movies.append(Movie(title=title, type=type, link=link, source=source, path=path))
+            Movie.objects.bulk_create([Movie(title=title, type=type, link=link, source=source, path=path) for title, type, link, source, path in movies])
 
         self.stdout.write(self.style.SUCCESS('Movies loaded successfully'))

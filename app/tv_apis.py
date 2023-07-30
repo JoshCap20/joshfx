@@ -16,9 +16,9 @@ def get_link(request):
         return HttpResponseNotFound("No query provided")
 
     if query.isdigit():
-        movie = get_object_or_404(Movie, id=query)
+        movie = get_object_or_404(Movie, id=query, active=True)
     else:
-        movie = Movie.objects.filter(title__icontains=query).first()
+        movie = Movie.objects.filter(title__icontains=query, active=True).first()
 
     if not movie:
         return HttpResponseNotFound("No movie found")
@@ -32,7 +32,7 @@ def get_results(request):
         return HttpResponseNotFound("No query provided")
 
     movie = Movie.objects.filter(
-        title__icontains=query).only('id', 'title', 'link')
+        title__icontains=query, active=True).only('id', 'title', 'link')
 
     if not movie:
         return HttpResponseNotFound("No movie found")

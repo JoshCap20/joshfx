@@ -1,6 +1,7 @@
 import re
 import time
 from wsgiref.util import FileWrapper
+from django.shortcuts import redirect
 
 import requests
 from django.http import StreamingHttpResponse
@@ -55,19 +56,19 @@ def stream_external_video_adv(movie, request):
     #     return
     
     headers["User-Agent"] = get_random_user_agent()
-    session = requests.Session()
     max_retries = 3
 
     for attempt in range(max_retries):
         try:
-            resp = session.get(url, headers=headers, stream=True, timeout=(10, 30), proxies=get_random_proxy_dict())
+            print(url)
+            resp = requests.get(url, headers=headers, stream=True, timeout=(20, 60), proxies=get_random_proxy_dict())
             break
         except RequestException as e:
             print(f"Request failed: {e}")
             if attempt < max_retries - 1:
                 time.sleep(0.1 * (2 ** attempt))
             else:
-                return 
+                return redirect(url)
 
 
     try:

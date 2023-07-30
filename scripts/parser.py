@@ -6,6 +6,8 @@ from urllib.parse import unquote, urljoin, urlparse
 import requests
 from bs4 import BeautifulSoup
 
+from scripts.proxies import get_random_proxy_dict
+
 # from scripts.proxy import proxy_request
 
 
@@ -22,8 +24,9 @@ class Scraper:
         "http://195.154.237.18:9000/",
         "http://23.147.64.113/",
         "http://124.184.68.140/",
+        
         # HAVENT TESTED BELOW
-
+        
         "https://didi2.ir/bestsitcomdl/",
         # "http://210.54.35.157:9000/",
         # "http://144.137.208.140:9000/",
@@ -107,13 +110,22 @@ class Scraper:
             return
         cls.visited.add(page_url)
         try:
-            response = requests.get(page_url, timeout=(20, 40))
+            response = requests.get(page_url, timeout=(20, 40), proxies=get_random_proxy_dict())
         except requests.exceptions.Timeout:
             print(f"Timed out: {page_url}")
             return
-        except:
+        except requests.exceptions.ConnectionError:
             # Need better error handling in future
-            print(f"Error: {page_url}")
+            try:
+                response = requests.get(page_url, timeout=(20, 40))
+            except:
+                print(f"Connect error: {page_url}")
+                return
+        except requests.exceptions.RequestException as e:
+            print(f"Request error: {e}")
+            return
+        except Exception as e:
+            print(f"Unknown error: {e}")
             return
 
         # response = proxy_request(page_url)

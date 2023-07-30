@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
@@ -18,4 +20,4 @@ urlpatterns = [
     ## TV APIs
     path("api/", get_link, name="get_link"),
     path("results/", get_results, name="get_results"),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

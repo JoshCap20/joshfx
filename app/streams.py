@@ -1,4 +1,5 @@
 import re
+import time
 from wsgiref.util import FileWrapper
 
 import requests
@@ -39,19 +40,34 @@ def stream_external_video_adv(movie, request):
             headers = {"Range": f"bytes={start}-{end}"}
         status_code = 206
 
+    # headers["User-Agent"] = get_random_user_agent()
+
+    # session = requests.Session()
+    # retry = Retry(total=3, backoff_factor=0.1, status_forcelist=[ 500, 502, 503, 504 ])
+    # adapter = HTTPAdapter(max_retries=retry)
+    # session.mount('http://', adapter)
+    # session.mount('https://', adapter)
+
+    # try:
+    #     resp = session.get(url, headers=headers, stream=True, timeout=(10, 30), proxies=get_random_proxy_dict())
+    # except RequestException as e:
+    #     print(f"Request failed: {e}")
+    #     return
+    
     headers["User-Agent"] = get_random_user_agent()
-
     session = requests.Session()
-    retry = Retry(total=3, backoff_factor=0.1, status_forcelist=[ 500, 502, 503, 504 ])
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
+    max_retries = 3
 
-    try:
-        resp = session.get(url, headers=headers, stream=True, timeout=(10, 30), proxies=get_random_proxy_dict())
-    except RequestException as e:
-        print(f"Request failed: {e}")
-        return
+    for attempt in range(max_retries):
+        try:
+            resp = session.get(url, headers=headers, stream=True, timeout=(10, 30), proxies=get_random_proxy_dict())
+            break
+        except RequestException as e:
+            print(f"Request failed: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(0.1 * (2 ** attempt))
+            else:
+                return 
 
 
     try:

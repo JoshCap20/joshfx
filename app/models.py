@@ -29,7 +29,7 @@ class Movie(models.Model):
             "type": self.type,
             "link": self.link,
             "source": self.source,
-            "stream": f"http://127.0.0.1:8000/stream/{self.id}",
+            "stream": f"http://127.0.0.1:8000/streams/{self.id}",
         }
 
 
